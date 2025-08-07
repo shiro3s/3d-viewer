@@ -1,7 +1,9 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 
 export const useDnd = () => {
+	const [inputFile, setInputFile] = useState<File | null>(null);
 	const dropzoneRef = useRef<HTMLDivElement>(null);
+
 	const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
 		event.preventDefault();
 	};
@@ -18,18 +20,21 @@ export const useDnd = () => {
 		event.preventDefault();
 		const files = event.dataTransfer.files;
 
-		const file = files?.[0]
-		if (!file) return
-		console.log(file);
+		const file = files?.[0];
+		if (!file) return;
+		setInputFile(file);
 	}, []);
 
-	const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-		const files = event.target.files;
-		const file = files?.[0];
-		if (!file) return
+	const handleChange = useCallback(
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const files = event.target.files;
+			const file = files?.[0];
+			if (!file) return;
 
-
-	}, [])
+			setInputFile(file);
+		},
+		[],
+	);
 
 	return {
 		dropzoneRef,
@@ -37,6 +42,7 @@ export const useDnd = () => {
 		handleDragEnter,
 		handleDragLeave,
 		handleDrop,
-		handleChange
+		handleChange,
+		inputFile
 	};
 };

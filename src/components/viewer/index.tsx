@@ -1,9 +1,13 @@
 import React from "react";
-
+import styles from "./style.module.css";
 import { useViewer } from "./useViewer";
 
-export const Viewer: React.FC = () => {
-	const { viewerRef } = useViewer();
+interface Props {
+	file: File;
+}
 
-	return <div ref={viewerRef} />;
+export const Viewer: React.FC<Props> = ({ file }) => {
+	const { viewerRef } = useViewer({ file });
+
+	return <canvas ref={viewerRef} className={styles.container} />;
 };

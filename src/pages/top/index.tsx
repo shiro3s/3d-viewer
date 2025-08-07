@@ -1,6 +1,6 @@
 import { Upload } from "lucide-react";
 import React from "react";
-
+import { Viewer } from "@/components/viewer";
 import styles from "./style.module.css";
 import { useDnd } from "./useDnd";
 
@@ -11,7 +11,8 @@ export const TopPage: React.FC = () => {
 		handleDragEnter,
 		handleDragLeave,
 		handleDrop,
-    handleChange
+		handleChange,
+		inputFile,
 	} = useDnd();
 
 	return (
@@ -23,21 +24,27 @@ export const TopPage: React.FC = () => {
 			onDragLeave={handleDragLeave}
 			onDrop={handleDrop}
 		>
-			<div className={styles.placeholder}>
-				<p className={styles.text}>Drag file or folder here</p>
-			</div>
-			<div>
-				<label htmlFor="inputFile" className={styles.label}>
-					<input 
-            type="file" 
-            id="inputFile"
-            className={styles.inputFile}
-            onChange={handleChange}
-          />
-					<Upload />
-					<span>Choose file</span>
-				</label>
-			</div>
+			{inputFile ? (
+				<Viewer file={inputFile} />
+			) : (
+				<>
+					<div className={styles.placeholder}>
+						<p className={styles.text}>Drag file or folder here</p>
+					</div>
+					<div>
+						<label htmlFor="inputFile" className={styles.label}>
+							<input
+								type="file"
+								id="inputFile"
+								className={styles.inputFile}
+								onChange={handleChange}
+							/>
+							<Upload />
+							<span>Choose file</span>
+						</label>
+					</div>
+				</>
+			)}
 		</div>
 	);
 };
