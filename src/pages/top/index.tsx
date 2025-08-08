@@ -38,6 +38,7 @@ export const TopPage: React.FC = () => {
 								id="inputFile"
 								className={styles.inputFile}
 								onChange={handleChange}
+								accept=".gltf,.glb"
 							/>
 							<Upload />
 							<span>Choose file</span>
