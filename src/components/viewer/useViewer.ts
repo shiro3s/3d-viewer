@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import {
 	AmbientLight,
+	Box3,
 	Color,
 	Group,
 	HemisphereLight,
@@ -11,6 +12,7 @@ import {
 	PMREMGenerator,
 	Scene,
 	Texture,
+	Vector3,
 	WebGLRenderer,
 } from "three";
 import {
@@ -114,6 +116,8 @@ export const useViewer = ({ file }: Args) => {
 		stateRef.current.renderer.toneMapping = LinearToneMapping;
 		stateRef.current.renderer.toneMappingExposure = 2 ** 0.0;
 
+    stateRef.current.scene.environment = stateRef.current.neutralEnvironment
+
 		const hemiLight = new HemisphereLight();
 		stateRef.current.scene.add(hemiLight);
 
@@ -122,14 +126,42 @@ export const useViewer = ({ file }: Args) => {
 
 		loadModel(file).then((model) => {
 			model.updateMatrixWorld();
+
+      console.log(model);
+
+			const box = new Box3().setFromObject(model);
+			const size = box.getSize(new Vector3()).length();
+			const center = box.getCenter(new Vector3());
+
+			stateRef.current.controller?.reset();
+
+			model.position.x -= center.x;
+			model.position.y -= center.y;
+			model.position.z -= center.z;
+
+			if (stateRef.current.controller)
+				stateRef.current.controller.maxDistance = size * 10;
+
+			if (stateRef.current.camera) {
+				stateRef.current.camera.near = size / 100;
+				stateRef.current.camera.far = size * 100;
+				stateRef.current.camera.updateProjectionMatrix();
+
+				stateRef.current.camera.position.copy(center);
+				stateRef.current.camera.position.x += size / 2.0;
+				stateRef.current.camera.position.y += size / 5.0;
+				stateRef.current.camera.position.z += size / 2.0;
+				stateRef.current.camera.lookAt(center);
+			}
+
 			stateRef.current.scene?.add(model);
 		});
 
 		const animate = () => {
-			const { renderer, scene, camera } = stateRef.current;
-			if (!renderer || !scene || !camera) return;
+			const { renderer, scene, camera, controller } = stateRef.current;
+			if (!renderer || !scene || !camera || !controller) return;
 
-			stateRef.current.controller?.update();
+			controller.update();
 			renderer.render(scene, camera);
 		};
 
